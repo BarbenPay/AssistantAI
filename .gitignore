@@ -1,0 +1,11 @@
+# Fichiers de compilation CMake
+cmake-build-*/
+.idea/
+
+# Fichiers générés par le système
+*.swp
+*~
+.DS_Store
+
+# Ignorer l'environnement virtuel Python
+venv/

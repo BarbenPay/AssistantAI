@@ -1,0 +1,22 @@
+# Pour la configuration (.env)
+python-dotenv
+
+# API Google (Agenda & Gmail)
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+
+# Modèle de langage local (Mistral GGUF)
+llama-cpp-python
+
+# Lecture des PDF dans les emails
+PyMuPDF
+
+# Pour les requêtes web (VirusTotal)
+requests
+
+# Pour extraire le texte des emails HTML
+beautifulsoup4
+
+# Pour l'interface graphique (GUI)
+customtkinter
