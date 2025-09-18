@@ -9,6 +9,3 @@ cmake-build-*/
 
 # Ignorer l'environnement virtuel Python
 venv/
-
-# Ignorer les fichiers de modèle LLM au format GGUF
-*.gguf
