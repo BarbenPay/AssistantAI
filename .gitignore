@@ -1,0 +1,14 @@
+# Fichiers de compilation CMake
+cmake-build-*/
+.idea/
+
+# Fichiers générés par le système
+*.swp
+*~
+.DS_Store
+
+# Ignorer l'environnement virtuel Python
+venv/
+
+# Ignorer les fichiers de modèle LLM au format GGUF
+*.gguf
