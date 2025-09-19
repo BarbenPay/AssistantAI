@@ -12,3 +12,4 @@ Ajout d'une fonction pour poser directement une question au LLM,
         Par exemple, après avoir reçu un email, on pourra demander au LLM de faire
         une recherche sur le destinataire ou de générer l'email de réponse.
 
+Accessibilité des différents agenda, pas que le personnel, permettre l'abonnement a des agendas distants
