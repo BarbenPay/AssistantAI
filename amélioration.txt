@@ -1,0 +1,14 @@
+AJouter une mémoire des échanges (pour donner un contexte)
+
+Ajouter un contexte sur l'utilisateur, et laisser le LLM la gestion de ce fichier.
+        Par exemple s'il voit une habitude.
+
+Meilleure interface
+
+Ajout d'une meilleure autonomie (Ajout de tache dans 'lagenda selon les emails.)
+
+Ajout d'une fonction pour poser directement une question au LLM,
+        c'est a dire qu'on a rajouter une fonction au LLM (LLM ou Assistant).
+        Par exemple, après avoir reçu un email, on pourra demander au LLM de faire
+        une recherche sur le destinataire ou de générer l'email de réponse.
+
