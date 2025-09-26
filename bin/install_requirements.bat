@@ -1,0 +1,20 @@
+@echo off
+echo "Configuration de l'environnement pour l'installation avec support GPU..."
+
+REM Définir les variables d'environnement pour forcer la compilation avec CUDA
+set CMAKE_ARGS="-DGGML_CUDA=on"
+set FORCE_CMAKE=1
+
+echo "Installation des dépendances depuis requirements.txt..."
+
+REM Installer les paquets en utilisant pip
+pip install -r requirements.txt --no-cache-dir --force-reinstall --upgrade
+
+echo "Nettoyage des variables d'environnement..."
+
+REM Nettoyer les variables pour ne pas affecter les autres commandes
+set CMAKE_ARGS=
+set FORCE_CMAKE=
+
+echo "Installation terminée !"
+pause

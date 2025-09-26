@@ -13,7 +13,7 @@ llm = Llama(
     n_ctx=4096, # Contexte du modèle
     n_batch=512,
     flash_attn=True,
-    verbose=False      
+    verbose=True
 )
 
 def call_mistral(prompt: str, max_token = 500) -> str:

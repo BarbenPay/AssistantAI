@@ -20,3 +20,4 @@ beautifulsoup4
 
 # Pour l'interface graphique (GUI)
 customtkinter
+Pillow
