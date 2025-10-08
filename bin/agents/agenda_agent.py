@@ -74,29 +74,43 @@ def add_event(summary, due_date_str):
         print(f"Agent Agenda: Erreur lors de la création de l'événement: {error}")
         return False
 
-def get_upcoming_events(max_events=10):
-    """Liste les prochains événements du calendrier et retourne leurs IDs."""
-    service = get_calendar_service()
-    upcoming_events = []
+def get_upcoming_events(max_results=10):
+    """Shows basic usage of the Google Calendar API.
+    Prints the start and name of the next 10 events on the user's calendar.
+    """
     try:
-        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        events_result = service.events().list(
-            calendarId="primary", timeMin=now, maxResults=max_events,
-            singleEvents=True, orderBy="startTime"
-        ).execute()
-        events = events_result.get("items", [])
-        
-        if not events:
-            return []
+        service = get_calendar_service()
 
-        for event in events:
-            start = event["start"].get("dateTime", event["start"].get("date"))
-            upcoming_events.append({"id": event["id"], "start": start, "summary": event["summary"]})
-        
+        # Call the Calendar API to get the list of calendars
+        calendar_list = service.calendarList().list().execute()
+        all_events = []
+
+        for calendar_list_entry in calendar_list.get('items', []):
+            calendar_id = calendar_list_entry['id']
+            now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+            events_result = service.events().list(calendarId=calendar_id, timeMin=now,
+                                                  maxResults=max_results, singleEvents=True,
+                                                  orderBy='startTime').execute()
+            events = events_result.get('items', [])
+            all_events.extend(events)
+
+        if not all_events:
+            return "Aucun événement à venir trouvé."
+
+        # Sort all events by start time
+        all_events.sort(key=lambda x: x['start'].get('dateTime', x['start'].get('date')))
+
+        # Limit to max_results
+        all_events = all_events[:max_results]
+
+        event_list = ""
+        for event in all_events:
+            start = event['start'].get('dateTime', event['start'].get('date'))
+            event_list += f"{start} - {event['summary']}\n"
+        return event_list
+
     except HttpError as error:
-        print(f"Agent Agenda: Erreur lors de la lecture des événements: {error}")
-    
-    return upcoming_events
+        return f"An error occurred: {error}"
 
 def delete_event(summary_to_delete):
     """Trouve un événement par son nom et le supprime."""

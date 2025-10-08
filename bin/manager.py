@@ -31,12 +31,30 @@ def format_tasks_as_string(tasks):
 def format_events_as_string(events):
     if not events:
         return "Aucun événement à venir dans votre agenda."
+    if isinstance(events, str):
+        return events
     response = "Voici vos 10 prochains événements :\n"
     for event in events:
-        start_time = event.get('start', 'N/A')
         summary = event.get('summary', 'Sans titre')
-        response += f"- {start_time}: {summary}\n"
-    return response.strip()
+        start_raw  = event.get('start', '')
+        try:
+            # Tente de parser une date/heure complète (avec fuseau horaire)
+            dt_object = datetime.fromisoformat(start_raw.replace('Z', '+00:00'))
+            # Formate en "Jour mois année à HH:MM"
+            start_formatted = dt_object.strftime('%d %B %Y à %H:%M')
+        except (ValueError, TypeError):
+            # Si ce n'est pas une date/heure complète, c'est probablement une date (AAAA-MM-JJ)
+            try:
+                dt_object = datetime.strptime(start_raw, '%Y-%m-%d')
+                # Formate en "Jour mois année"
+                start_formatted = dt_object.strftime('%d %B %Y') + " (toute la journée)"
+            except (ValueError, TypeError):
+                # Si le formatage échoue, on affiche la date brute
+                start_formatted = start_raw
+
+        response += f"- {summary} (Le {start_formatted})\n"
+
+    return response
 
 def format_emails_as_string(analyzed_emails):
     if not analyzed_emails:

@@ -13,7 +13,6 @@ load_dotenv(dotenv_path=dotenv_path)
 
 # --- Clés API & Identifiants ---
 # On charge toutes les variables ici, une bonne fois pour toutes.
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
