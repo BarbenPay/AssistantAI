@@ -16,15 +16,12 @@ SCOPES = ["https://www.googleapis.com/auth/calendar"]
 def get_calendar_service():
     """Se connecte à l'API et retourne un objet 'service' pour interagir."""
     creds = None
-    # Charger le token existant s'il est présent
     if os.path.exists(config.TOKEN_PATH):
         try:
             creds = Credentials.from_authorized_user_file(config.TOKEN_PATH, SCOPES)
         except Exception:
-            # Token illisible/corrompu: on l'ignorera et on ré-authentifiera.
             creds = None
 
-    # Si pas de creds valides, on tente un refresh si possible, sinon on relance un flow complet
     if not creds or not creds.valid:
         refreshed = False
         if creds and creds.expired and creds.refresh_token:
@@ -32,26 +29,21 @@ def get_calendar_service():
                 creds.refresh(Request())
                 refreshed = True
             except RefreshError:
-                # invalid_grant (token expiré/révoqué) => on supprime l'ancien token et on réauthentifie
                 try:
                     if os.path.exists(config.TOKEN_PATH):
                         os.remove(config.TOKEN_PATH)
                 except OSError:
                     pass
-                creds = None  # on forcera un nouveau flow ci-dessous
+                creds = None
 
         if not refreshed:
-            # Vérifier la présence du fichier credentials.json
             if not os.path.exists(config.CREDENTIALS_PATH):
                 raise FileNotFoundError(
                     f"Fichier d'identifiants introuvable: {config.CREDENTIALS_PATH}. "
                     "Activez l'API Calendar, téléchargez credentials.json et placez-le au bon emplacement."
                 )
-            # Lancer un nouveau flow OAuth (ouvre le navigateur)
             flow = InstalledAppFlow.from_client_secrets_file(config.CREDENTIALS_PATH, SCOPES)
-            # port=0 laisse le système choisir un port libre, pratique pour éviter les collisions
             creds = flow.run_local_server(port=0)
-            # Sauvegarder le token pour les prochaines exécutions
             with open(config.TOKEN_PATH, "w", encoding="utf-8") as token:
                 token.write(creds.to_json())
 
@@ -81,13 +73,12 @@ def get_upcoming_events(max_results=10):
     try:
         service = get_calendar_service()
 
-        # Call the Calendar API to get the list of calendars
         calendar_list = service.calendarList().list().execute()
         all_events = []
 
         for calendar_list_entry in calendar_list.get('items', []):
             calendar_id = calendar_list_entry['id']
-            now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+            now = datetime.datetime.utcnow().isoformat() + 'Z'
             events_result = service.events().list(calendarId=calendar_id, timeMin=now,
                                                   maxResults=max_results, singleEvents=True,
                                                   orderBy='startTime').execute()
@@ -97,10 +88,8 @@ def get_upcoming_events(max_results=10):
         if not all_events:
             return "Aucun événement à venir trouvé."
 
-        # Sort all events by start time
         all_events.sort(key=lambda x: x['start'].get('dateTime', x['start'].get('date')))
 
-        # Limit to max_results
         all_events = all_events[:max_results]
 
         event_list = ""
@@ -120,7 +109,6 @@ def delete_event(summary_to_delete):
     
     event_to_delete = None
     for event in all_events:
-        # On cherche une correspondance (insensible à la casse et partielle)
         if summary_to_delete.lower() in event['summary'].lower():
             event_to_delete = event
             print(f"Agent Agenda: Événement trouvé : '{event['summary']}'")

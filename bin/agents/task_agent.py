@@ -17,9 +17,7 @@ def setup_database():
         """
         conn = sqlite3.connect(config.DB_PATH)
         c = conn.cursor()
-        # On supprime l'ancienne table pour éviter les conflits de structure lors de la mise à jour
         c.execute('DROP TABLE IF EXISTS tasks')
-        # Création de la nouvelle table avec plus de colonnes
         c.execute('''
             CREATE TABLE tasks (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,14 +53,12 @@ def get_tasks(status_filter=None):
     Retourne une liste de dictionnaires pour une utilisation facile.
     """
     conn = sqlite3.connect(config.DB_PATH)
-    # Permet de retourner les résultats sous forme de dictionnaires
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     query = "SELECT * FROM tasks"
     params = []
     if status_filter:
-        # Permet de filtrer par plusieurs statuts, ex: ['à faire', 'en cours']
         if isinstance(status_filter, list):
             placeholders = ','.join('?' for status in status_filter)
             query += f" WHERE status IN ({placeholders})"
@@ -87,11 +83,11 @@ def display_tasks(tasks):
     for task in tasks:
         priority_map = {1: "Haute", 2: "Moyenne", 3: "Basse"}
         due_date_str = "N/A"
-        if task.get('due_date'): # Utiliser .get() est plus sûr
+        if task.get('due_date'):
             try:
                 due_date_str = datetime.strptime(task['due_date'], '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
             except (ValueError, TypeError):
-                due_date_str = "Date invalide" # Au cas où le format serait incorrect
+                due_date_str = "Date invalide"
         print(
             f"- [ID: {task['id']}] {task['description']} "
             f"(Priorité: {priority_map.get(task['priority'], 'N/A')}, Statut: {task['status']}, "
@@ -130,13 +126,9 @@ def delete_task(task_id):
     conn.close()
 
 
-# --- Bloc principal pour initialisation ---
 if __name__ == '__main__':
-    # Cette fonction va recréer votre base de données.
-    # Attention : cela effacera les tâches existantes une seule fois.
     setup_database()
-    
-    # Ajout de quelques tâches pour l'exemple
+
     print("\n--- Ajout de tâches de test ---")
     add_task("Répondre à l'email de Jean", priority=1, due_date="2025-07-10 18:00:00", source="email_agent")
     add_task("Préparer la présentation projet", priority=2)

@@ -5,12 +5,11 @@ import config
 import json
 import re
 
-# Charger le modèle une seule fois au démarrage.
-# Assurez-vous que le chemin dans config.py est correct.
+
 llm = Llama(
     model_path=config.MODEL_PATH,
-    n_gpu_layers=-1, # Mettre -1 pour utiliser le GPU, 0 pour le CPU
-    n_ctx=4096, # Contexte du modèle
+    n_gpu_layers=-1,
+    n_ctx=4096,
     n_batch=512,
     flash_attn=True,
     verbose=True
@@ -25,14 +24,14 @@ def call_mistral(prompt: str, max_token = 500) -> str:
         output = llm(
             prompt,
             max_tokens=max_token,
-            stop=["[INST]", "USER:"], # Arrête la génération à ces mots
+            stop=["[INST]", "USER:"],
             echo=False
         )
         response_text = output["choices"][0]["text"].strip()
         return response_text
     except Exception as e:
         print(f"Erreur lors de l'appel au modèle Mistral : {e}")
-        return "" # Retourne une chaîne vide en cas d'erreur
+        return ""
 
 def get_json_from_mistral(prompt: str) -> dict:
     """
@@ -43,7 +42,6 @@ def get_json_from_mistral(prompt: str) -> dict:
     if not raw_text:
         return None
 
-    # Regex pour trouver un bloc de code JSON, similaire à celle pour Gemini
     match = re.search(r'```json\s*(\{.*?\})\s*```', raw_text, re.DOTALL)
     if not match:
         match = re.search(r'(\{.*?\})', raw_text, re.DOTALL)

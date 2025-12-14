@@ -8,7 +8,7 @@ import hashlib
 def _get_analysis_report(analysis_id, headers):
     """Interroge le rapport d'analyse jusqu'à ce qu'il soit complété."""
     url_analysis = f"https://www.virustotal.com/api/v3/analyses/{analysis_id}"
-    for _ in range(12):  # On essaie pendant 2 minutes (12 * 10s)
+    for _ in range(12):
         response_analysis = requests.get(url_analysis, headers=headers, timeout=30)
         response_analysis.raise_for_status()
         result = response_analysis.json()
@@ -30,27 +30,22 @@ def scan_file_with_virustotal(file_data: bytes):
     print("      -> Contact de l'API VirusTotal pour analyse de sécurité...")
     headers = {"x-apikey": config.VIRUSTOTAL_API_KEY}
     
-    # On calcule le hash pour identifier le fichier
     file_hash = hashlib.sha256(file_data).hexdigest()
     url_check_report = f"https://www.virustotal.com/api/v3/files/{file_hash}"
 
     try:
-        # 1. Vérifier si un rapport existe déjà
         response_check = requests.get(url_check_report, headers=headers, timeout=30)
         
         analysis_result = None
         
         if response_check.status_code == 200:
             print("      -> Un rapport existant a été trouvé pour ce fichier.")
-            # Si le rapport existe, on récupère directement l'ID de la dernière analyse
             analysis_id = response_check.json()["data"]["attributes"]["last_analysis_results"]
-            # On doit reconstruire un semblant de rapport pour la suite
             stats = response_check.json()["data"]["attributes"]["last_analysis_stats"]
             analysis_result = {"data": {"attributes": {"stats": stats}}}
 
         elif response_check.status_code == 404:
             print("      -> Aucun rapport existant. Envoi du fichier pour une nouvelle analyse.")
-            # 2. Si le fichier est inconnu, on l'envoie
             url_upload = "https://www.virustotal.com/api/v3/files"
             files = {"file": (file_hash, file_data)}
             response_upload = requests.post(url_upload, headers=headers, files=files, timeout=60)
@@ -59,11 +54,10 @@ def scan_file_with_virustotal(file_data: bytes):
             analysis_result = _get_analysis_report(analysis_id, headers)
         
         else:
-            # Gérer d'autres erreurs HTTP inattendues
             response_check.raise_for_status()
 
         if not analysis_result:
-            return False # L'analyse a échoué ou a pris trop de temps
+            return False
 
         # 3. Vérifier les résultats
         stats = analysis_result["data"]["attributes"]["stats"]

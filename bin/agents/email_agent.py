@@ -181,8 +181,6 @@ def get_email_analysis(max_count=5):
     print(f"Agent E-mail: {len(raw_emails)} e-mail(s) trouvé(s). Analyse en cours...")
     all_analyses = []
     for raw_email in raw_emails:
-        # --- CORRECTION ICI ---
-        # On récupère bien les 3 valeurs (sender, subject, body)
         sender, subject, body = parse_email(raw_email)
         print(f"Agent E-mail: Analyse de '{subject}' de '{sender}'...")
         try:

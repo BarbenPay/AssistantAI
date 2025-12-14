@@ -9,3 +9,6 @@ cmake-build-*/
 
 # Ignorer l'environnement virtuel Python
 venv/
+
+# Ignorer les fichiers .env
+bin/config/.env
